@@ -2,12 +2,13 @@ package com.customgrant.custom_grant.entities;
 
 import com.customgrant.custom_grant.entities.enums.RoleType;
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "tb_roles")
-public class Role {
+public class Role implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -29,7 +30,7 @@ public class Role {
     }
 
     public static Role of(final Role role) {
-        return Role.from(role.getId(), role.getAuthority());
+        return Role.from(role.getId(), role.authority);
     }
 
     public UUID getId() {
@@ -40,8 +41,9 @@ public class Role {
         this.id = id;
     }
 
-    public RoleType getAuthority() {
-        return authority;
+    @Override
+    public String getAuthority() {
+        return authority.getType();
     }
 
     public void setAuthority(final RoleType authority) {
