@@ -4,4 +4,11 @@ spring:
 
   jpa:
     open-in-view: false
-    show-sql: true
+
+security:
+  client:
+    client-id: ${CLIENT_ID:default-client-id}
+    client-secret: ${CLIENT_SECRET:default-secret}
+    redirect-uris: ${REDIRECT_URI:http://localhost:8080/login/oauth2/code/my-client-id}
+  jwt:
+    duration: ${JWT_TOKEN_DURATION:86400}
