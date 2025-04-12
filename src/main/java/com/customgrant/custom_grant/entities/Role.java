@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "tb_role")
+@Table(name = "tb_roles")
 public class Role {
 
     @Id
