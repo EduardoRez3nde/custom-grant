@@ -1,1 +1,7 @@
-spring.application.name=custom-grant
+spring:
+  config:
+    activate:
+      on-profile: test
+  jpa:
+    open-in-view: false
+    show-sql: true

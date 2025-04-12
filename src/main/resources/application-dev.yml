@@ -1,0 +1,4 @@
+postgresql:
+  username: postgres
+  password: 123
+  database: custom_grant
