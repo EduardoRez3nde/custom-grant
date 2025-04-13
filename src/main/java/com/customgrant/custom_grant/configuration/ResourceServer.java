@@ -3,6 +3,7 @@ package com.customgrant.custom_grant.configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,6 +17,8 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -37,10 +40,11 @@ public class ResourceServer {
 
         httpSecurity
                 .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/register").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
-                        .requestMatchers("/auth/login").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                        .requestMatchers("/auth/register").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/auth/login").hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 ->
@@ -49,7 +53,6 @@ public class ResourceServer {
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
                 );
-
         return httpSecurity.build();
     }
 
@@ -100,5 +103,6 @@ public class ResourceServer {
 
         return authenticationConverter;
     }
+
 
 }

@@ -46,6 +46,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -81,6 +82,7 @@ public class AuthorizationServer {
                                 .registeredClientRepository(registerClient())
                                 .authorizationService(oAuth2AuthorizationService())
                                 .authorizationConsentService(oAuth2AuthorizationConsentService())
+                                .tokenGenerator(tokenGenerator())
                 )
                 .authorizeHttpRequests((authorize) ->
                         authorize.anyRequest().authenticated()
@@ -111,8 +113,9 @@ public class AuthorizationServer {
                 .withId(UUID.randomUUID().toString())
                 .clientId(clientId)
                 .clientSecret(passwordEncoder().encode(clientSecret))
-                .scope("write")
-                .scope("read")
+                .scopes(scope ->
+                        scope.addAll(Set.of("write", "read"))
+                )
                 .redirectUri(redirectUri)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
@@ -121,7 +124,8 @@ public class AuthorizationServer {
                 .clientSettings(ClientSettings.builder()
                         .requireAuthorizationConsent(true)
                         .requireProofKey(true)
-                        .build())
+                        .build()
+                )
                 .build();
 
         return new InMemoryRegisteredClientRepository(registeredClient);
@@ -162,7 +166,8 @@ public class AuthorizationServer {
                         .issuer(issuerUri)
                         .claim("username", user.getName())
                         .claim("authorities", authorities)
-                        .claim("scope", context.getAuthorizedScopes());
+                        .claim("scope", context.getAuthorizedScopes())
+                        .expiresAt(Instant.now().plus(Duration.ofHours(1)));
             }
         };
     }
@@ -196,8 +201,7 @@ public class AuthorizationServer {
         try {
             final KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
             keyPairGenerator.initialize(2048);
-            final KeyPair keyPair = keyPairGenerator.generateKeyPair();
-            return keyPair;
+            return keyPairGenerator.generateKeyPair();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }

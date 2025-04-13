@@ -17,7 +17,19 @@ spring:
           issuer-uri: https://auth-server:9000
           jwk-set-uri: http://localhost:9000/oauth2/jwks
           audiences: https://my-resource-server.example.com
+    cors:
+      allowed-origins:
+        - "http://localhost:3000"
+        - "https://meusite.com"
+      allowed-methods:
+        - "GET"
+        - "POST"
+        - "PUT"
+        - "DELETE"
+      allowed-headers:
+        - "*"
+      allow-credentials: true
 
-jwt:
-  token:
-    duration: ${JWT_TOKEN_DURATION:86400}
+#jwt:
+#  token:
+#    duration: ${JWT_TOKEN_DURATION:86400}
