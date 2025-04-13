@@ -64,8 +64,8 @@ public class AuthorizationServer {
     @Value("${security.client.redirect-uri}")
     private String redirectUri;
 
-    @Value("${security.jwt.duration}")
-    private String duration;
+    @Value("${security.oauth2.resource-server.jwt.issuer-uri}")
+    private String issuerUri;
 
     @Bean
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -97,8 +97,6 @@ public class AuthorizationServer {
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize ->
                         authorize.anyRequest().authenticated()
                 )
@@ -161,6 +159,7 @@ public class AuthorizationServer {
                         .collect(Collectors.toSet());
 
                 context.getClaims()
+                        .issuer(issuerUri)
                         .claim("username", user.getName())
                         .claim("authorities", authorities)
                         .claim("scope", context.getAuthorizedScopes());

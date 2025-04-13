@@ -5,10 +5,19 @@ spring:
   jpa:
     open-in-view: false
 
-security:
-  client:
-    client-id: ${CLIENT_ID:default-client-id}
-    client-secret: ${CLIENT_SECRET:default-secret}
-    redirect-uris: ${REDIRECT_URI:http://localhost:8080/login/oauth2/code/my-client-id}
-  jwt:
+  security:
+    client:
+      client-id: ${CLIENT_ID:default-client-id}
+      client-secret: ${CLIENT_SECRET:default-secret}
+      redirect-uris: ${REDIRECT_URI:http://localhost:8080/login/oauth2/code/my-client-id}
+
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: https://auth-server:9000
+          jwk-set-uri: http://localhost:9000/oauth2/jwks
+          audiences: https://my-resource-server.example.com
+
+jwt:
+  token:
     duration: ${JWT_TOKEN_DURATION:86400}
