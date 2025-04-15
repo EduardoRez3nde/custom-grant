@@ -7,21 +7,26 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
@@ -30,12 +35,13 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.authorization.token.*;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
@@ -51,24 +57,31 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Profile("dev")
 @Configuration
 @EnableWebSecurity
-@Import(OAuth2AuthorizationServerConfiguration.class)
 public class AuthorizationServer {
 
-    @Value("${security.client.client-id}")
+    @Value("${security.oauth2.client.registration.my-client.client-id}")
     private String clientId;
 
-    @Value("${security.client.client-secret}")
+    @Value("${security.oauth2.client.registration.my-client.client-secret}")
     private String clientSecret;
 
-    @Value("${security.client.redirect-uri}")
+    @Value("${security.oauth2.client.registration.my-client.redirect-uri}")
     private String redirectUri;
 
-    @Value("${security.oauth2.resource-server.jwt.issuer-uri}")
+    @Value("${security.resource-server.jwt.issuer-uri}")
     private String issuerUri;
 
+    private final CorsOriginConfiguration corsOriginConfiguration;
+
+    public AuthorizationServer(CorsOriginConfiguration corsOriginConfiguration) {
+        this.corsOriginConfiguration = corsOriginConfiguration;
+    }
+
     @Bean
+    @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
         OAuth2AuthorizationServerConfigurer auth2AuthorizationServerConfigurer =
@@ -76,16 +89,19 @@ public class AuthorizationServer {
 
         httpSecurity
                 .securityMatcher(auth2AuthorizationServerConfigurer.getEndpointsMatcher())
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsOriginConfiguration.corsConfiguration()))
                 .with(auth2AuthorizationServerConfigurer, (authorizationServer) ->
                         authorizationServer
                                 .oidc(Customizer.withDefaults())
                                 .registeredClientRepository(registerClient())
                                 .authorizationService(oAuth2AuthorizationService())
                                 .authorizationConsentService(oAuth2AuthorizationConsentService())
+                                .authorizationServerSettings(authorizationServerSettings())
                                 .tokenGenerator(tokenGenerator())
                 )
-                .authorizeHttpRequests((authorize) ->
-                        authorize.anyRequest().authenticated()
+                .authorizeHttpRequests(authorize -> authorize
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling((exceptions) -> exceptions
                         .defaultAuthenticationEntryPointFor(
@@ -97,14 +113,36 @@ public class AuthorizationServer {
     }
 
     @Bean
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .authorizeHttpRequests(authorize ->
-                        authorize.anyRequest().authenticated()
+    @Order(2)
+    public SecurityFilterChain loginSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/login", "/logout")
+                .authorizeHttpRequests(authorize -> authorize
+                        .anyRequest().permitAll()
                 )
                 .formLogin(Customizer.withDefaults());
+        return http.build();
+    }
 
-        return httpSecurity.build();
+    @Bean
+    @Primary
+    public UserDetailsService userDetailsService() {
+        UserDetails userDetails = User.builder()
+                .username("default")
+                .password(passwordEncoder().encode("123"))
+                .roles("ADMIN", "USER")
+                .build();
+        return new InMemoryUserDetailsManager(userDetails);
+    }
+
+    @Bean
+    public AuthorizationServerSettings authorizationServerSettings() {
+        return AuthorizationServerSettings.builder()
+                .issuer(issuerUri)
+                .authorizationEndpoint("/oauth2/authorize")
+                .tokenEndpoint("/oauth2/token")
+                .jwkSetEndpoint("/oauth2/jwks")
+                .build();
     }
 
     @Bean
@@ -171,10 +209,9 @@ public class AuthorizationServer {
             }
         };
     }
-
     @Bean
-    public JwtDecoder jwtDecoder(final JWKSource<SecurityContext> jwkSource) {
-        return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
+    public JwtEncoder jwtEncoder(final JWKSource<SecurityContext> jwkSource) {
+        return new NimbusJwtEncoder(jwkSource);
     }
 
     @Bean
