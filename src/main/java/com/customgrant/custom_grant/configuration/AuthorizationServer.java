@@ -57,7 +57,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Profile("dev")
 @Configuration
 @EnableWebSecurity
 public class AuthorizationServer {
@@ -75,9 +74,14 @@ public class AuthorizationServer {
     private String issuerUri;
 
     private final CorsOriginConfiguration corsOriginConfiguration;
+    private final TokenConfiguration tokenConfiguration;
 
-    public AuthorizationServer(CorsOriginConfiguration corsOriginConfiguration) {
+    public AuthorizationServer(
+            final CorsOriginConfiguration corsOriginConfiguration,
+            final TokenConfiguration tokenConfiguration
+    ) {
         this.corsOriginConfiguration = corsOriginConfiguration;
+        this.tokenConfiguration = tokenConfiguration;
     }
 
     @Bean
@@ -98,10 +102,9 @@ public class AuthorizationServer {
                                 .authorizationService(oAuth2AuthorizationService())
                                 .authorizationConsentService(oAuth2AuthorizationConsentService())
                                 .authorizationServerSettings(authorizationServerSettings())
-                                .tokenGenerator(tokenGenerator())
+                                .tokenGenerator(tokenConfiguration.tokenGenerator())
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/callback").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling((exceptions) -> exceptions
@@ -126,17 +129,6 @@ public class AuthorizationServer {
     }
 
     @Bean
-    @Primary
-    public UserDetailsService userDetailsService() {
-        UserDetails userDetails = User.builder()
-                .username("dudu")
-                .password(passwordEncoder().encode("123"))
-                .roles("ADMIN", "USER")
-                .build();
-        return new InMemoryUserDetailsManager(userDetails);
-    }
-
-    @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
                 .issuer(issuerUri)
@@ -150,16 +142,14 @@ public class AuthorizationServer {
     public RegisteredClientRepository registerClient() {
         RegisteredClient registeredClient = RegisteredClient
                 .withId(UUID.randomUUID().toString())
-                .clientId("default-client-id")
-                .clientSecret(passwordEncoder().encode("default-secret"))
-                .scopes(scope ->
-                        scope.addAll(Set.of("write", "read"))
-                )
-                .redirectUri("http://localhost:8080/callback")
+                .clientId(clientId)
+                .clientSecret(passwordEncoder().encode(clientSecret))
+                .scopes(scope -> scope.addAll(Set.of("write", "read")))
+                .redirectUri(redirectUri)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .tokenSettings(tokenSettings())
+                .tokenSettings(tokenConfiguration.tokenSettings())
                 .clientSettings(ClientSettings.builder()
                         .requireAuthorizationConsent(true)
                         .requireProofKey(true)
@@ -169,81 +159,6 @@ public class AuthorizationServer {
         System.out.println("Client ID registrado: " + registeredClient.getClientId());
 
         return new InMemoryRegisteredClientRepository(registeredClient);
-    }
-
-    @Bean
-    public TokenSettings tokenSettings() {
-        return TokenSettings.builder()
-                .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
-                .refreshTokenTimeToLive(Duration.ofDays(40))
-                .reuseRefreshTokens(true)
-                .idTokenSignatureAlgorithm(SignatureAlgorithm.RS256)
-                .build();
-    }
-
-    @Bean
-    public OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator() {
-        final NimbusJwtEncoder jwtEncoder = new NimbusJwtEncoder(jwkSource());
-        final JwtGenerator jwtGenerator = new JwtGenerator(jwtEncoder);
-        final OAuth2AccessTokenGenerator accessTokenGenerator = new OAuth2AccessTokenGenerator();
-        final OAuth2RefreshTokenGenerator refreshTokenGenerator = new OAuth2RefreshTokenGenerator();
-        return new DelegatingOAuth2TokenGenerator(jwtGenerator, accessTokenGenerator, refreshTokenGenerator);
-    }
-
-    @Bean
-    public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
-        return context -> {
-
-            if (context.getTokenType().getValue().equals("access_token")) {
-
-                final Authentication user = context.getPrincipal();
-
-                final Set<String> authorities = user.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toSet());
-
-                context.getClaims()
-                        .issuer(issuerUri)
-                        .claim("username", user.getName())
-                        .claim("authorities", authorities)
-                        .claim("scope", context.getAuthorizedScopes())
-                        .expiresAt(Instant.now().plus(Duration.ofHours(1)));
-            }
-        };
-    }
-    @Bean
-    public JwtEncoder jwtEncoder(final JWKSource<SecurityContext> jwkSource) {
-        return new NimbusJwtEncoder(jwkSource);
-    }
-
-    @Bean
-    public JWKSource<SecurityContext> jwkSource() {
-        final RSAKey rsaKey = generateRsa();
-        final JWKSet jwkSet = new JWKSet(rsaKey);
-        return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
-    }
-
-    @Bean
-    public static RSAKey generateRsa() {
-
-        final KeyPair keyPair = generateRsaKeyPair();
-        final RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        final RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-
-        return new RSAKey.Builder(publicKey)
-                .privateKey(privateKey)
-                .keyID(UUID.randomUUID().toString()).build();
-    }
-
-    @Bean
-    public static KeyPair generateRsaKeyPair() {
-        try {
-            final KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048);
-            return keyPairGenerator.generateKeyPair();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Bean

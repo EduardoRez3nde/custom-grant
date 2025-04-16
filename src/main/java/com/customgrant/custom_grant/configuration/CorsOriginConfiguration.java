@@ -10,7 +10,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
-@Profile("dev")
 @Configuration
 @ConfigurationProperties(prefix = "security.cors")
 public class CorsOriginConfiguration {
