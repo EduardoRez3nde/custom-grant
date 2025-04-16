@@ -33,10 +33,10 @@ import java.util.List;
 @EnableMethodSecurity
 public class ResourceServer {
 
-    @Value("${security.resource-server.jwt.jwk-set-uri}")
+    @Value("${spring.security.resource-server.jwt.jwk-set-uri}")
     private String jwkSetUri;
 
-    @Value("${security.resource-server.jwt.issuer-uri}")
+    @Value("${spring.security.resource-server.jwt.issuer-uri}")
     private String issuerUri;
 
     @Bean

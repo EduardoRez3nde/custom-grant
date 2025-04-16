@@ -62,16 +62,16 @@ import java.util.stream.Collectors;
 @EnableWebSecurity
 public class AuthorizationServer {
 
-    @Value("${security.oauth2.client.registration.my-client.client-id}")
+    @Value("${spring.security.oauth2.client.registration.my-client.client-id}")
     private String clientId;
 
-    @Value("${security.oauth2.client.registration.my-client.client-secret}")
+    @Value("${spring.security.oauth2.client.registration.my-client.client-secret}")
     private String clientSecret;
 
-    @Value("${security.oauth2.client.registration.my-client.redirect-uri}")
+    @Value("${spring.security.oauth2.client.registration.my-client.redirect-uri}")
     private String redirectUri;
 
-    @Value("${security.resource-server.jwt.issuer-uri}")
+    @Value("${spring.security.resource-server.jwt.issuer-uri}")
     private String issuerUri;
 
     private final CorsOriginConfiguration corsOriginConfiguration;
@@ -101,6 +101,7 @@ public class AuthorizationServer {
                                 .tokenGenerator(tokenGenerator())
                 )
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/callback").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling((exceptions) -> exceptions
@@ -116,7 +117,7 @@ public class AuthorizationServer {
     @Order(2)
     public SecurityFilterChain loginSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/login", "/logout")
+                .securityMatcher("/login", "/logout", "/callback")
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().permitAll()
                 )
@@ -128,7 +129,7 @@ public class AuthorizationServer {
     @Primary
     public UserDetailsService userDetailsService() {
         UserDetails userDetails = User.builder()
-                .username("default")
+                .username("dudu")
                 .password(passwordEncoder().encode("123"))
                 .roles("ADMIN", "USER")
                 .build();
@@ -149,12 +150,12 @@ public class AuthorizationServer {
     public RegisteredClientRepository registerClient() {
         RegisteredClient registeredClient = RegisteredClient
                 .withId(UUID.randomUUID().toString())
-                .clientId(clientId)
-                .clientSecret(passwordEncoder().encode(clientSecret))
+                .clientId("default-client-id")
+                .clientSecret(passwordEncoder().encode("default-secret"))
                 .scopes(scope ->
                         scope.addAll(Set.of("write", "read"))
                 )
-                .redirectUri(redirectUri)
+                .redirectUri("http://localhost:8080/callback")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
@@ -165,6 +166,7 @@ public class AuthorizationServer {
                         .build()
                 )
                 .build();
+        System.out.println("Client ID registrado: " + registeredClient.getClientId());
 
         return new InMemoryRegisteredClientRepository(registeredClient);
     }
@@ -175,7 +177,7 @@ public class AuthorizationServer {
                 .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
                 .refreshTokenTimeToLive(Duration.ofDays(40))
                 .reuseRefreshTokens(true)
-                .idTokenSignatureAlgorithm(SignatureAlgorithm.RS512)
+                .idTokenSignatureAlgorithm(SignatureAlgorithm.RS256)
                 .build();
     }
 

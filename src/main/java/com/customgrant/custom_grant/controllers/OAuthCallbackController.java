@@ -25,22 +25,24 @@ public class OAuthCallbackController {
 
     public String codePerToken(String code) {
 
-        final WebClient webClient = WebClient.create();
+        final WebClient webClient = WebClient.builder()
+                .baseUrl("http://localhost:8080")
+                .defaultHeaders(headers -> headers.setBasicAuth("default-client-id", "default-secret"))
+                .build();
 
         return webClient.post()
-                .uri("http://localhost:8080/oauth2/token")
-                .headers(headers -> headers.setBasicAuth("default-client-id", "default-secret"))
+                .uri("/oauth2/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData("grant_type", "authorization_code")
+                        .with("client_id", "default-client-id")
                         .with("code", code)
                         .with("redirect_uri", "http://localhost:8080/callback")
-                        .with("client_id", "default-client-id")
-                        .with("client_secret", "default-secret")
-                        .with("code_verifier", "rCHJqeVpvtCX7pTOeZXc1RGNC8b-mhC0MOSPxvwXPNM")
+                        .with("code_verifier", "e-ZUM9ycJVDA7icWxAwa-5CckCZMSka9tUZmLiUTRk4")
                 )
                 .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        response -> response.bodyToMono(String.class).map(RuntimeException::new))
                 .bodyToMono(String.class)
                 .block();
-
     }
 }

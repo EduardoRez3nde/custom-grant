@@ -9,3 +9,5 @@ postgresql:
 logging:
   level:
     org.springframework.security: DEBUG
+    orr.springframework.security.oauth2=DEBUG:
+

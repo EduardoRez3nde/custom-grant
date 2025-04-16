@@ -5,40 +5,40 @@ spring:
   jpa:
     open-in-view: false
 
-security:
-  oauth2:
-    client:
-      registration:
-        my-client:
-          client-id: ${CLIENT_ID:default-client-id}
-          client-secret: ${CLIENT_SECRET:default-secret}
-          authorization-grant-type: authorization_code
-          redirect-uri: "http://localhost:8080/callback"
-          scope: read,write
-      provider:
-        my-provider:
-          authorization-uri: http://localhost:8080/oauth2/authorize
-          token-uri: http://localhost:8080/oauth2/token
-          user-info-uri: http://localhost:8080/userinfo
-  resource-server:
-    jwt:
-      issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:8080}
-      jwk-set-uri: ${OAUTH2_JWK_SET_URI:http://localhost:8080/oauth2/jwks}
-      audiences: ${OAUTH2_AUDIENCES:https://my-resource-server.example.com}
+  security:
+    oauth2:
+      client:
+        registration:
+          my-client:
+            client-id: ${CLIENT_ID:default-client-id}
+            client-secret: ${CLIENT_SECRET:default-secret}
+            authorization-grant-type: authorization_code
+            redirect-uri: "http://localhost:8080/callback"
+            scope: read,write
+        provider:
+          my-provider:
+            authorization-uri: http://localhost:8080/oauth2/authorize
+            token-uri: http://localhost:8080/oauth2/token
+            user-info-uri: http://localhost:8080/userinfo
+    resource-server:
+      jwt:
+        issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:8080}
+        jwk-set-uri: ${OAUTH2_JWK_SET_URI:http://localhost:8080/oauth2/jwks}
+        audiences: ${OAUTH2_AUDIENCES:http://my-resource-server.example.com}
 
-  cors:
-    allowed-origins:
-      - "http://localhost:3000"
-      - "http://localhost:8080"
-    allowed-methods:
-      - "GET"
-      - "POST"
-      - "PUT"
-      - "DELETE"
-    allowed-headers:
-      - "*"
-    allow-credentials: true
+    cors:
+      allowed-origins:
+        - "http://localhost:3000"
+        - "http://localhost:8080"
+      allowed-methods:
+        - "GET"
+        - "POST"
+        - "PUT"
+        - "DELETE"
+      allowed-headers:
+        - "*"
+      allow-credentials: true
 
-# jwt:
-#   token:
-#     duration: ${JWT_TOKEN_DURATION:86400}
+  # jwt:
+  #   token:
+  #     duration: ${JWT_TOKEN_DURATION:86400}
