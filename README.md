@@ -15,18 +15,19 @@
 - Você pode usar este projeto como base para criar sua própria infraestrutura de autenticação com OAuth2 e JWT. Ele permite que aplicações web e mobile façam login com segurança, obtenham um access token e acessem recursos protegidos com base em permissões e escopos.
 
 ### 📦 Tecnologias
-- Java
+- Java 21
 - Spring Boot 3
 - Spring Authorization Server
 - Spring Security
-- JWT (NimbusJOSE)
+- JWT (RS256)
+- JWK Set
 - PKCE
 - OAuth 2.1
 
 ⚙️ Como rodar o projeto
 #### 1 - Clone o repositório
 ```
-git clone git@github.com:EduardoRez3nde/custom-grant.git
+git@github.com:EduardoRez3nde/custom-grant.git
 ```
 
 #### 2 - Execute a aplicação
@@ -162,8 +163,9 @@ Exemplo de token JWT emitido:
 13. **STS retorna access token e refresh token**  
    - Se a verificação for bem-sucedida, os tokens são retornados ao cliente.
 
-🚨 **Obs:** O endpoint **/callback** foi criado apenas para teste completo do fluxo. Deveria ser implementado no cliente.
-
+⚠️ Observação importante
+O endpoint `/callback` foi criado apenas para fins de teste do fluxo completo.
+Em ambientes reais com PKCE, a troca do code por token deve ser feita pelo cliente.
 #### Exemplo: 
   ```
   POST /oauth2/token
@@ -201,8 +203,3 @@ Exemplo de token JWT emitido:
 🐙 [@EduardoRez3nde](https://github.com/EduardoRez3nde)
 
 ---
-
-
-
-
-
