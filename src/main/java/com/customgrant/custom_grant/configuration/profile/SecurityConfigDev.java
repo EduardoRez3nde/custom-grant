@@ -12,11 +12,11 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Profile("dev")
 @Configuration
-public class SecurityFilterDev {
+public class SecurityConfigDev {
 
     private final PasswordEncoder passwordEncoder;
 
-    public SecurityFilterDev(PasswordEncoder passwordEncoder) {
+    public SecurityConfigDev(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }
 
