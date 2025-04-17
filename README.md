@@ -26,7 +26,7 @@
 ⚙️ Como rodar o projeto
 #### 1 - Clone o repositório
 ```
-git@github.com:EduardoRez3nde/custom-grant.git
+git clone git@github.com:EduardoRez3nde/custom-grant.git
 ```
 
 #### 2 - Execute a aplicação
