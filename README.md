@@ -15,12 +15,11 @@
 - Você pode usar este projeto como base para criar sua própria infraestrutura de autenticação com OAuth2 e JWT. Ele permite que aplicações web e mobile façam login com segurança, obtenham um access token e acessem recursos protegidos com base em permissões e escopos.
 
 ### 📦 Tecnologias
-- Java 21
+- Java
 - Spring Boot 3
 - Spring Authorization Server
 - Spring Security
-- JWT (RS256)
-- JWK Set
+- JWT (NimbusJOSE)
 - PKCE
 - OAuth 2.1
 
