@@ -163,8 +163,9 @@ Exemplo de token JWT emitido:
 13. **STS retorna access token e refresh token**  
    - Se a verificação for bem-sucedida, os tokens são retornados ao cliente.
 
-🚨 **Obs:** O endpoint **/callback** foi criado apenas para teste completo do fluxo. Deveria ser implementado no cliente.
-
+⚠️ Observação importante
+O endpoint `/callback` foi criado apenas para fins de teste do fluxo completo.
+Em ambientes reais com PKCE, a troca do code por token deve ser feita pelo cliente.
 #### Exemplo: 
   ```
   POST /oauth2/token
@@ -202,8 +203,3 @@ Exemplo de token JWT emitido:
 🐙 [@EduardoRez3nde](https://github.com/EduardoRez3nde)
 
 ---
-
-
-
-
-
