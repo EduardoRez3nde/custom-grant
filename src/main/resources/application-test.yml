@@ -17,15 +17,16 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  h2:
+  console:
+    enabled: true
+    path: /h2-console
 logging:
   level:
     org.springframework.security: DEBUG
     org.springframework.web: DEBUG
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
     org.springframework.boot.autoconfigure.security: DEBUG
+    org.h2.server.web: DEBUG
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
 
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console

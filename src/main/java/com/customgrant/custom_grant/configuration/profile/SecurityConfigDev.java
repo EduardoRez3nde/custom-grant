@@ -20,14 +20,14 @@ public class SecurityConfigDev {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Bean
-    @Primary
-    public UserDetailsService userDetailsService() {
-        UserDetails userDetails = User.builder()
-                .username("default")
-                .password(passwordEncoder.encode("123"))
-                .roles("ADMIN", "USER")
-                .build();
-        return new InMemoryUserDetailsManager(userDetails);
-    }
+//    @Bean
+//    @Primary
+//    public UserDetailsService userDetailsService() {
+//        UserDetails userDetails = User.builder()
+//                .username("default")
+//                .password(passwordEncoder.encode("123"))
+//                .roles("ADMIN", "USER")
+//                .build();
+//        return new InMemoryUserDetailsManager(userDetails);
+//    }
 }

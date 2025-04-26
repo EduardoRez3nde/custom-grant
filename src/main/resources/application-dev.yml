@@ -2,10 +2,12 @@ spring:
   config:
     activate:
       on-profile: dev
-postgresql:
+
+postgres:
   username: postgres
   password: 123
   database: custom_grant
+
 logging:
   level:
     org.springframework.security: DEBUG

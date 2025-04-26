@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.*;
 
 @Entity
-@Table(name = "tb_user")
+@Table(name = "tb_users")
 public class User implements UserDetails {
 
     @Id
@@ -30,17 +30,18 @@ public class User implements UserDetails {
 
     public User() { }
 
-    private User(final String username, final String password) {
+    private User(final String username, final String password, final Set<Role> roles) {
         this.username = username;
         this.password = password;
+        this.roles.addAll(roles);
     }
 
-    public static User from(final String username, final String password) {
-        return new User(username, password);
+    public static User from(final String username, final String password, final Set<Role> roles) {
+        return new User(username, password, roles);
     }
 
     public static User of(final User user) {
-        return User.from(user.getUsername(), user.getPassword());
+        return User.from(user.getUsername(), user.getPassword(), user.getRoles());
     }
 
     public UUID getId() {
