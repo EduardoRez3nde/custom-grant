@@ -6,6 +6,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: custom_grant
+      POSTGRESQL_POSTGRESQL_CONF_FILE: /opt/bitnami/postgresql/conf/postgresql.conf
+      POSTGRESQL_EXTRA_FLAGS: "-c wal_level=logical -c max_wal_senders=4 -c max_replication_slots=4"
     ports:
       - "5432:5432"
     volumes:
