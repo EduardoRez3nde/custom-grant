@@ -157,3 +157,4 @@ public class AuthorizationServer {
         return configuration.getAuthenticationManager();
     }
 }
+//         kafkaTemplate.send("accessToken", 0, Instant.now(), user.getId(), new AccessTokenDTO(user.getId(), ))
