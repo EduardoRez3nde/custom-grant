@@ -9,5 +9,9 @@ public record RoleDTO(String authority) {
         return new RoleDTO(role.getAuthority());
     }
 
+    public static RoleDTO of(final String authority) {
+        return new RoleDTO(authority);
+    }
+
     public RoleType toRoleType() { return RoleType.valueOf(authority); }
 }

@@ -1,6 +1,6 @@
 package com.customgrant.custom_grant.configuration.kafka;
 
-import com.customgrant.custom_grant.dtos.AccessTokenDTO;
+import com.customgrant.custom_grant.dtos.AccessLoginDTO;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -17,7 +17,7 @@ import java.util.Map;
 public class KafkaProducerConfig {
 
     @Bean
-    public ProducerFactory<String, AccessTokenDTO> producerFactory() {
+    public ProducerFactory<String, AccessLoginDTO> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfig());
     }
 
@@ -26,7 +26,7 @@ public class KafkaProducerConfig {
 
         Map<String, Object> properties = new HashMap<>();
 
-        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:29092");
+        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
@@ -34,7 +34,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, AccessTokenDTO> kafkaTemplate() {
+    public KafkaTemplate<String, AccessLoginDTO> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 }

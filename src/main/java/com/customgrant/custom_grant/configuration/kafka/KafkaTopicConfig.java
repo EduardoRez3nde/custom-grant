@@ -12,7 +12,7 @@ public class KafkaTopicConfig {
     public KafkaAdmin.NewTopics topics() {
         return new KafkaAdmin.NewTopics(
                 TopicBuilder
-                        .name("accessToken")
+                        .name("accessLogin")
                         .partitions(1)
                         .replicas(1)
                         .compact()

@@ -1,7 +1,7 @@
 package com.customgrant.custom_grant.controllers;
 
 import com.customgrant.custom_grant.configuration.TokenConfiguration;
-import com.customgrant.custom_grant.dtos.AccessTokenDTO;
+import com.customgrant.custom_grant.dtos.AccessLoginDTO;
 import com.customgrant.custom_grant.dtos.RegisterDTO;
 import com.customgrant.custom_grant.entities.Role;
 import com.customgrant.custom_grant.entities.User;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,9 +28,9 @@ public class AuthenticationController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
-    private final KafkaTemplate<String, AccessTokenDTO> kafkaTemplate;
+    private final KafkaTemplate<String, AccessLoginDTO> kafkaTemplate;
 
-    public AuthenticationController(AuthenticationManager authenticationManager, TokenConfiguration tokenConfiguration, UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, KafkaTemplate<String, AccessTokenDTO> kafkaTemplate) {
+    public AuthenticationController(AuthenticationManager authenticationManager, TokenConfiguration tokenConfiguration, UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, KafkaTemplate<String, AccessLoginDTO> kafkaTemplate) {
         this.authenticationManager = authenticationManager;
         this.tokenConfiguration = tokenConfiguration;
         this.userRepository = userRepository;

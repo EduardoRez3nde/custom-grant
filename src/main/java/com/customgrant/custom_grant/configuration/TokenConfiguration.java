@@ -1,12 +1,18 @@
 package com.customgrant.custom_grant.configuration;
 
+import com.customgrant.custom_grant.configuration.kafka.event.LoginAccessEvent;
+import com.customgrant.custom_grant.dtos.AccessLoginDTO;
+import com.customgrant.custom_grant.dtos.RoleDTO;
+import com.customgrant.custom_grant.entities.Role;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.OAuth2Token;
@@ -34,6 +40,12 @@ public class TokenConfiguration {
     @Value("${spring.security.resource-server.jwt.issuer-uri}")
     private String issuerUri;
 
+    private final ApplicationEventPublisher eventPublisher;
+
+    public TokenConfiguration(final ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
+
     @Bean
     public TokenSettings tokenSettings() {
         return TokenSettings.builder()
@@ -46,8 +58,12 @@ public class TokenConfiguration {
 
     @Bean
     public OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator() {
+
+        System.out.println("✅ ✅ ✅ ✅ token Generator✅ ✅ ✅ ✅ ✅ ✅ ");
+
         final NimbusJwtEncoder jwtEncoder = new NimbusJwtEncoder(jwkSource());
         final JwtGenerator jwtGenerator = new JwtGenerator(jwtEncoder);
+        jwtGenerator.setJwtCustomizer(jwtCustomizer());
         final OAuth2AccessTokenGenerator accessTokenGenerator = new OAuth2AccessTokenGenerator();
         final OAuth2RefreshTokenGenerator refreshTokenGenerator = new OAuth2RefreshTokenGenerator();
         return new DelegatingOAuth2TokenGenerator(jwtGenerator, accessTokenGenerator, refreshTokenGenerator);
@@ -55,9 +71,15 @@ public class TokenConfiguration {
 
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
+        System.out.println("### Token customizer foi invocado");
+
         return context -> {
 
+            System.out.println("✅ ✅ ✅ ✅ Token customizer foi invocado✅ ✅ ✅ ✅ ✅ ✅ ");
+            System.out.println("### Tipo de token: " + context.getTokenType().getValue());
+
             if (context.getTokenType().getValue().equals("access_token")) {
+
 
                 final Authentication user = context.getPrincipal();
 
@@ -71,6 +93,11 @@ public class TokenConfiguration {
                         .claim("authorities", authorities)
                         .claim("scope", context.getAuthorizedScopes())
                         .expiresAt(Instant.now().plus(Duration.ofHours(1)));
+                System.out.println("Emitindo token via authorization_code, enviando mensagem para Kafka");
+
+                AccessLoginDTO loginInfo = AccessLoginDTO.from(user.getName(), user.getPrincipal().toString(), authorities);
+                System.out.println("🔥 Publicando evento LoginAccessEvent: " + loginInfo);
+                eventPublisher.publishEvent(new LoginAccessEvent(this, loginInfo));
             }
         };
     }

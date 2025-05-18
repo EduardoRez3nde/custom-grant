@@ -42,11 +42,12 @@ services:
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_HOST
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       CLUSTER_ID: 8af4bf91-1f82-4741-a019-05bb909f87c2
     ports:
       - "9001:9001"
+      - "9092:9092"
     volumes:
       - kafka_data:/var/lib/kafka/data
     networks:
