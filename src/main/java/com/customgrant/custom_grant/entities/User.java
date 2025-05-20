@@ -20,28 +20,24 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private final Set<Role> roles = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     public User() { }
 
-    private User(final String username, final String password, final Set<Role> roles) {
+    private User(final String username, final String password, final Role role) {
         this.username = username;
         this.password = password;
-        this.roles.addAll(roles);
+        this.role = role;
     }
 
-    public static User from(final String username, final String password, final Set<Role> roles) {
-        return new User(username, password, roles);
+    public static User from(final String username, final String password, final Role role) {
+        return new User(username, password, role);
     }
 
     public static User of(final User user) {
-        return User.from(user.getUsername(), user.getPassword(), user.getRoles());
+        return User.from(user.getUsername(), user.getPassword(), user.getRole());
     }
 
     public UUID getId() {
@@ -56,8 +52,16 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     @Override
@@ -92,8 +96,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getRoles();
+        return List.of(role);
     }
-
 }
 

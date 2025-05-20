@@ -30,6 +30,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -80,12 +81,11 @@ public class TokenConfiguration {
 
             if (context.getTokenType().getValue().equals("access_token")) {
 
-
                 final Authentication user = context.getPrincipal();
 
-                final Set<String> authorities = user.getAuthorities().stream()
+                final List<String> authorities = user.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toSet());
+                                .toList();
 
                 context.getClaims()
                         .issuer(issuerUri)
@@ -95,7 +95,7 @@ public class TokenConfiguration {
                         .expiresAt(Instant.now().plus(Duration.ofHours(1)));
                 System.out.println("Emitindo token via authorization_code, enviando mensagem para Kafka");
 
-                AccessLoginDTO loginInfo = AccessLoginDTO.from(user.getName(), user.getPrincipal().toString(), authorities);
+                AccessLoginDTO loginInfo = AccessLoginDTO.from(user.getName(), authorities.getFirst());
                 System.out.println("🔥 Publicando evento LoginAccessEvent: " + loginInfo);
                 eventPublisher.publishEvent(new LoginAccessEvent(this, loginInfo));
             }

@@ -18,7 +18,7 @@ public class LoginAccessListener {
     @EventListener
     public void onLoginAccess(final LoginAccessEvent event) {
         final AccessLoginDTO accessLogin = event.getLoginInfo();
-        kafkaTemplate.send("accessLogin", accessLogin.email(), accessLogin);
+        kafkaTemplate.send("accessLogin", accessLogin.username(), accessLogin);
         System.out.println("✅ Mensagem enviada para Kafka: " + event.getLoginInfo());
     }
 }

@@ -2,8 +2,8 @@ package com.customgrant.custom_grant.entities.enums;
 
 public enum RoleType {
 
-    ROLE_USER("USER"),
-    ROLE_ADMIN("ADMIN");
+    ROLE_TEACHER("TEACHER"),
+    ROLE_STUDENT("STUDENT");
 
     final String type;
 

@@ -1,16 +1,14 @@
 package com.customgrant.custom_grant.dtos;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.customgrant.custom_grant.entities.Role;
 
-public record AccessLoginDTO(String userId, String email, Set<RoleDTO> roles) {
+public record AccessLoginDTO(String username, RoleDTO role) {
 
-    public static AccessLoginDTO from(final String userId, final String email, final Set<String> roles) {
+    public static AccessLoginDTO from(final String username, final String role) {
 
         return new AccessLoginDTO(
-                userId,
-                email,
-                roles.stream().map(RoleDTO::of).collect(Collectors.toSet())
+                username,
+                RoleDTO.of(role)
         );
     }
 }

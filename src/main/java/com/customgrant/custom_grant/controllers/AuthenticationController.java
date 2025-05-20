@@ -47,12 +47,10 @@ public class AuthenticationController {
         }
 
         final String encodePassword = passwordEncoder.encode(dto.password());
+        final Role authority = roleRepository.findByAuthority(dto.role().toRoleType())
+                .orElseThrow();
 
-        Set<Role> roles = dto.roles().stream()
-                .map(role -> roleRepository.findByAuthority(role.toRoleType()).orElseThrow())
-                .collect(Collectors.toSet());
-
-        User user = User.from(dto.username(), encodePassword, roles);
+        User user = User.from(dto.username(), encodePassword, authority);
         user = userRepository.save(user);
 
         return ResponseEntity.ok(RegisterDTO.from(user));

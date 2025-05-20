@@ -20,17 +20,33 @@ public class Role implements GrantedAuthority {
 
     public Role() { }
 
-    private Role(final UUID id, final RoleType authority) {
-        this.id = id;
-        this.authority = authority;
+    private Role(final Builder builder) {
+        this.id = builder.id;
+        this.authority = builder.authority;
     }
 
-    public static Role from(final UUID id, final RoleType authority) {
-        return new Role(id, authority);
+    public static class Builder {
+
+        private UUID id;
+        private RoleType authority;
+
+        public Builder id(final UUID id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder authority(final RoleType authority) {
+            this.authority = authority;
+            return this;
+        }
+
+        public Role build() {
+            return new Role(this);
+        }
     }
 
-    public static Role of(final Role role) {
-        return Role.from(role.getId(), role.authority);
+    public static Builder builder() {
+        return new Builder();
     }
 
     public UUID getId() {
@@ -44,6 +60,10 @@ public class Role implements GrantedAuthority {
     @Override
     public String getAuthority() {
         return authority.getType();
+    }
+
+    public RoleType getRole() {
+        return authority;
     }
 
     public void setAuthority(final RoleType authority) {
