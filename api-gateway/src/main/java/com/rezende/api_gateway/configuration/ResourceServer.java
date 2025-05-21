@@ -1,11 +1,9 @@
-package com.customgrant.custom_grant.configuration;
+package com.rezende.api_gateway.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,11 +18,7 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import javax.swing.*;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +35,7 @@ public class ResourceServer {
     private String issuerUri;
 
     @Bean
-    @Order(4)
+    @Order(1)
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
         httpSecurity
@@ -50,6 +44,8 @@ public class ResourceServer {
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/student/**").hasAnyRole("ROLE_STUDENT")
+                        .requestMatchers("/teacher/**").hasAnyRole("ROLE_TEACHER")
                         .requestMatchers("/auth/register").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -66,7 +62,7 @@ public class ResourceServer {
     public JwtDecoder jwtDecoder() {
         final NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder
                 .withJwkSetUri(jwkSetUri)
-                .jwsAlgorithm(SignatureAlgorithm.RS512)
+                .jwsAlgorithm(SignatureAlgorithm.RS256)
                 .build();
 
         final JwtTimestampValidator timestampValidator = new JwtTimestampValidator(Duration.ofSeconds(30));

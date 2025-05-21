@@ -1,0 +1,18 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: student-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/students/**
+        - id: admin-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/admin/**
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          jwk-set-uri: http://auth-server:9000/oauth2/jwks
+          issuer-uri: http://auth-server:9000
