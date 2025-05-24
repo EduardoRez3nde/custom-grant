@@ -1,4 +1,4 @@
-package com.rezende.api_gateway.configuration;
+package com.customgrant.api_gateway.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

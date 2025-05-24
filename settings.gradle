@@ -1,0 +1,5 @@
+rootProject.name = 'custom-grant'
+
+include 'api-gateway'
+include 'authentication-service'
+include 'student_service'
