@@ -1,0 +1,9 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+postgres:
+  username: postgres
+  password: 123
+  database: student-service

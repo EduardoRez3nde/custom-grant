@@ -10,7 +10,6 @@ public class LoginAccessListener {
 
     private final KafkaTemplate<String, AccessLoginDTO> kafkaTemplate;
 
-
     public LoginAccessListener(final KafkaTemplate<String, AccessLoginDTO> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }

@@ -5,7 +5,6 @@ import com.customgrant.student_service.entities.Student;
 import com.customgrant.student_service.repositories.StudentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,14 +44,5 @@ public class StudentService {
                         .photoProfileUrl(student.getPhotoProfileUrl())
                         .build()
         );
-    }
-
-    @Transactional
-    public StudentDTO insert(final StudentDTO dto) {
-
-        final Student student = Student.of(
-                d
-        );
-
     }
 }
