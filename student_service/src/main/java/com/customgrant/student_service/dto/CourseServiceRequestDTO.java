@@ -1,10 +1,8 @@
 package com.customgrant.student_service.dto;
 
-import java.util.UUID;
+public record CourseServiceRequestDTO(String requestId, String userId, int pageNumber, int pageSize) {
 
-public record CourseServiceRequestDTO(String requestId, String userId) {
-
-    public static CourseServiceRequestDTO of(final String requestId, final UUID userId) {
-        return new CourseServiceRequestDTO(requestId, String.valueOf(userId));
+    public static CourseServiceRequestDTO of(final String requestId, final String userId, final int pageNumber, final int pageSize) {
+        return new CourseServiceRequestDTO(requestId, userId, pageNumber, pageSize);
     }
 }

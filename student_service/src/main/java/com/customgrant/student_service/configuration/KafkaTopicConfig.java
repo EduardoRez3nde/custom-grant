@@ -12,7 +12,7 @@ public class KafkaTopicConfig {
     public KafkaAdmin.NewTopics topics() {
         return new KafkaAdmin.NewTopics(
                 TopicBuilder
-                        .name("list-available-courses")
+                        .name("request-list-available-courses")
                         .partitions(1)
                         .replicas(1)
                         .compact()

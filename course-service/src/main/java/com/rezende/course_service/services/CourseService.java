@@ -44,17 +44,16 @@ public class CourseService {
     @KafkaListener(
             topics = "${spring.kafka.topic.request-course-from-student}",
             groupId = "${spring.kafka.consumer.group-id}",
-            containerFactory = "requestKafkaListenerContainerFactory"
-    )
+            containerFactory = "requestKafkaListenerContainerFactory")
     public void consumeStudentCourseRequest(@Payload final StudentRequestDTO studentRequest) {
 
         final Pageable pageable = PageRequest.of(0, 10);
         final Page<CourseDTO> availableCourses = findAllAvailableCourse(pageable);
 
-        final ResponseListCourseDTO responseCourses = ResponseListCourseDTO.valueOf(
+        final ResponseListCourseDTO responseCourses = ResponseListCourseDTO.of(
                 studentRequest.requestId(),
                 studentRequest.userId(),
-                availableCourses
+                availableCourses.toList()
         );
         final ListAvailableCoursesEvent event = new ListAvailableCoursesEvent(this, responseCourses);
         eventPublisher.publishEvent(event);
