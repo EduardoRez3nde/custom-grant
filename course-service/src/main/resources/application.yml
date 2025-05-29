@@ -1,12 +1,10 @@
-server:
-  port: 8082
 spring:
   profiles:
     active: test
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      group-id: student-service
+      group-id: course-service-student-request-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -17,3 +15,6 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    topic:
+      request-course-from-student: list-available-courses

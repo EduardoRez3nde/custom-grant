@@ -1,22 +1,21 @@
 services:
   db:
     image: bitnami/postgresql:17.4.0
-    container_name: postgres_db
+    container_name: postgres_db-course
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
-      POSTGRES_DB: student-service
+      POSTGRES_DB: course-service
       POSTGRESQL_EXTRA_FLAGS: "-c wal_level=logical -c max_wal_senders=4 -c max_replication_slots=4"
     ports:
-      - "5433:5433"
+      - "5434:5434"
     volumes:
-      - postgres_data_student:/var/lib/postgresql/data
+      - postgres_data_course:/var/lib/postgresql/data
     networks:
-      - shared_net_student
+      - shared_net_course
+
 networks:
-  shared_net_student:
+  shared_net_course:
 
 volumes:
-  kafka_data:
-  kafka_connect:
-  postgres_data_student:
+  postgres_data_course:

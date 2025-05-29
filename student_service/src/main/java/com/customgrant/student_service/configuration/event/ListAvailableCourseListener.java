@@ -1,5 +1,6 @@
 package com.customgrant.student_service.configuration.event;
 
+import com.customgrant.student_service.dto.CourseServiceRequestDTO;
 import com.customgrant.student_service.dto.StudentDTO;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -11,10 +12,9 @@ import java.util.UUID;
 @Service
 public class ListAvailableCourseListener {
 
-    private final KafkaTemplate<String, StudentDTO> kafkaTemplate;
+    private final KafkaTemplate<String, CourseServiceRequestDTO> kafkaTemplate;
 
-
-    public ListAvailableCourseListener(final KafkaTemplate<String, StudentDTO> kafkaTemplate) {
+    public ListAvailableCourseListener(final KafkaTemplate<String, CourseServiceRequestDTO> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
@@ -22,12 +22,9 @@ public class ListAvailableCourseListener {
     public void onListAvailableCourse(final ListAvailableCoursesEvent event) {
 
         final StudentDTO student = event.getLoginInfo();
-
-        final StudentDTO payload = new StudentDTO.Builder()
-                .id(student.getId())
-                .build();
-
         final String requestId = UUID.randomUUID().toString();
+
+        final CourseServiceRequestDTO payload = CourseServiceRequestDTO.of(requestId, student.getId());
 
         kafkaTemplate.send("list-available-courses", requestId, payload);
 

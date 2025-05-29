@@ -1,7 +1,6 @@
-package com.customgrant.student_service.configuration;
+package com.rezende.course_service.configuration;
 
-import com.customgrant.student_service.dto.CourseServiceRequestDTO;
-import com.customgrant.student_service.dto.StudentDTO;
+import com.rezende.course_service.dto.ResponseListCourseDTO;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +17,7 @@ import java.util.Map;
 public class KafkaProducerConfig {
 
     @Bean
-    public ProducerFactory<String, CourseServiceRequestDTO> producerFactory() {
+    public ProducerFactory<String, ResponseListCourseDTO> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfig());
     }
 
@@ -27,7 +26,7 @@ public class KafkaProducerConfig {
 
         Map<String, Object> properties = new HashMap<>();
 
-        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9093");
+        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
@@ -35,7 +34,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, CourseServiceRequestDTO> kafkaTemplate() {
+    public KafkaTemplate<String, ResponseListCourseDTO> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 }
