@@ -24,7 +24,7 @@ public class KafkaConsumerConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    @Value("${spring.kafka.consumer.group-id}")
+    @Value("${spring.kafka.consumer.group-id.student-course-response}")
     private String defaultGroupId;
 
     @Value("${spring.kafka.consumer.auto-offset-reset}")

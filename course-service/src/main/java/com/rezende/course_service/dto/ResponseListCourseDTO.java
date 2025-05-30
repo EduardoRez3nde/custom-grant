@@ -4,7 +4,7 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-public record ResponseListCourseDTO(String requestId, String userId, List<CourseDTO> course) {
+public record ResponseListCourseDTO(String requestId, String userId, List<CourseDTO> courses) {
 
     public static ResponseListCourseDTO of(final String requestId, final String userId, List<CourseDTO> courses) {
         return new ResponseListCourseDTO(requestId, userId, courses);

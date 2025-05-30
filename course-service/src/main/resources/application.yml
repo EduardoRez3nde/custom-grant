@@ -6,6 +6,7 @@ spring:
     consumer:
       group-id: course-service-student-request-group
       auto-offset-reset: earliest
+      enable-auto-commit: false
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
@@ -17,4 +18,4 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
     topic:
-      request-course-from-student: list-available-courses
+      request-course-from-student: request-list-available-courses
