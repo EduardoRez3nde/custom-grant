@@ -1,6 +1,6 @@
 package com.customgrant.student_service.configuration;
 
-import com.customgrant.student_service.dto.CourseServiceRequestDTO;
+import com.customgrant.student_service.dto.course.CourseServiceRequestDTO;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;

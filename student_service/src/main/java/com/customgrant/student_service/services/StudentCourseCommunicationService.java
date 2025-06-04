@@ -1,7 +1,7 @@
 package com.customgrant.student_service.services;
 
-import com.customgrant.student_service.dto.CourseServiceRequestDTO;
-import com.customgrant.student_service.dto.CourseServiceResponseDTO;
+import com.customgrant.student_service.dto.course.CourseServiceRequestDTO;
+import com.customgrant.student_service.dto.course.CourseServiceResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,7 +65,9 @@ public class StudentCourseCommunicationService {
     }
 
     public void completeCourseRequest(final String requestId, final CourseServiceResponseDTO response) {
+
         final CompletableFuture<CourseServiceResponseDTO> future = pendingCourseRequests.get(requestId);
+
         if (future != null && !future.isDone()) {
             LOGGER.info("STUDENT-SERVICE: Completando future para requestId: {}", requestId);
             future.complete(response);
@@ -75,7 +77,9 @@ public class StudentCourseCommunicationService {
     }
 
     public void failCourseRequest(final String requestId, final Throwable throwable) {
+
         final CompletableFuture<CourseServiceResponseDTO> future = pendingCourseRequests.get(requestId);
+
         if (future != null && !future.isDone()) {
             LOGGER.warn("STUDENT-SERVICE: Falhando future para requestId: {}", requestId, throwable);
             future.completeExceptionally(throwable);

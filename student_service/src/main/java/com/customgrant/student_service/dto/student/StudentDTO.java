@@ -1,4 +1,4 @@
-package com.customgrant.student_service.dto;
+package com.customgrant.student_service.dto.student;
 
 import java.time.Instant;
 import java.util.UUID;

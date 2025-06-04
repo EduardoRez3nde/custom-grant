@@ -1,4 +1,4 @@
-package com.customgrant.student_service.dto;
+package com.customgrant.student_service.dto.course;
 
 public record CourseServiceRequestDTO(String requestId, String userId, int pageNumber, int pageSize) {
 

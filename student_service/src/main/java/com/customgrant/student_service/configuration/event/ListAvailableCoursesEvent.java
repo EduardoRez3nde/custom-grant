@@ -1,6 +1,6 @@
 package com.customgrant.student_service.configuration.event;
 
-import com.customgrant.student_service.dto.StudentDTO;
+import com.customgrant.student_service.dto.student.StudentDTO;
 import org.springframework.context.ApplicationEvent;
 
 public class ListAvailableCoursesEvent extends ApplicationEvent {

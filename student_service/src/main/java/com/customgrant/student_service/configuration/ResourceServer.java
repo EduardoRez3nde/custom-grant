@@ -1,4 +1,4 @@
-package com.customgrant.api_gateway.configuration;
+package com.customgrant.student_service.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -105,3 +105,4 @@ public class ResourceServer {
         return authenticationConverter;
     }
 }
+

@@ -1,7 +1,7 @@
 package com.customgrant.student_service.configuration.event;
 
-import com.customgrant.student_service.dto.CourseServiceRequestDTO;
-import com.customgrant.student_service.dto.StudentDTO;
+import com.customgrant.student_service.dto.course.CourseServiceRequestDTO;
+import com.customgrant.student_service.dto.student.StudentDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

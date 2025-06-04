@@ -1,6 +1,6 @@
 package com.customgrant.student_service.services;
 
-import com.customgrant.student_service.dto.CourseServiceResponseDTO;
+import com.customgrant.student_service.dto.course.CourseServiceResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -45,7 +45,9 @@ public class CourseResponseConsumer {
 
         if (response.getCourses() != null && !response.getCourses().isEmpty())
             LOGGER.info("STUDENT-SERVICE: Cursos para requestId {} foram recebidos e o CompletableFuture foi completado.", key);
-        else
+        else {
             LOGGER.info("STUDENT-SERVICE: Nenhum curso recebido para requestId {}. O CompletableFuture foi completado com uma resposta vazia (ou poderia ser completado com erro se apropriado).", key);
+            communicationService.failCourseRequest(response.getRequestId(), new Throwable());
+        }
     }
 }

@@ -1,16 +1,20 @@
 package com.customgrant.student_service.controllers;
 
-import com.customgrant.student_service.dto.CourseServiceResponseDTO;
-import com.customgrant.student_service.dto.StudentDTO;
+import com.customgrant.student_service.dto.course.CourseServiceResponseDTO;
+import com.customgrant.student_service.dto.student.StudentDTO;
+import com.customgrant.student_service.dto.student.StudentProfileDTO;
+import com.customgrant.student_service.dto.student.UpdateStudentProfileDTO;
 import com.customgrant.student_service.services.StudentCourseCommunicationService;
 import com.customgrant.student_service.services.StudentService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,6 +48,25 @@ public class StudentController {
     public ResponseEntity<Page<StudentDTO>> findAll(final Pageable pageable) {
         return ResponseEntity.ok(studentService.findAll(pageable));
     }
+
+    @GetMapping("/profile")
+    public ResponseEntity<StudentProfileDTO> getStudentProfileByAuthUserId(final @AuthenticationPrincipal Jwt jwt) {
+        final String userId = jwt.getSubject();
+        final StudentProfileDTO studentProfile = studentService.getStudentProfileByAuthUserId(userId);
+        return ResponseEntity.ok(studentProfile);
+    }
+
+    @PutMapping
+    public ResponseEntity<UpdateStudentProfileDTO> updateStudentProfile(
+            final @AuthenticationPrincipal Jwt jwt,
+            @Valid @RequestBody final UpdateStudentProfileDTO updateProfile
+    ) {
+            final String userId = jwt.getSubject();
+            final UpdateStudentProfileDTO studentProfile = studentService.updateStudentProfile(userId, updateProfile);
+
+            return ResponseEntity.ok(studentProfile);
+    }
+
 
     @GetMapping("/available-courses")
     public ResponseEntity<?> findAvailableCourses(

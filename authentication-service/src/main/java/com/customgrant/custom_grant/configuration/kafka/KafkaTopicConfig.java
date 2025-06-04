@@ -12,7 +12,7 @@ public class KafkaTopicConfig {
     public KafkaAdmin.NewTopics topics() {
         return new KafkaAdmin.NewTopics(
                 TopicBuilder
-                        .name("accessLogin")
+                        .name("UserRegisteredEvent")
                         .partitions(1)
                         .replicas(1)
                         .compact()

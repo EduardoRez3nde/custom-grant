@@ -4,6 +4,7 @@ import com.customgrant.custom_grant.configuration.kafka.event.LoginAccessEvent;
 import com.customgrant.custom_grant.dtos.AccessLoginDTO;
 import com.customgrant.custom_grant.dtos.RoleDTO;
 import com.customgrant.custom_grant.entities.Role;
+import com.customgrant.custom_grant.entities.User;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -72,6 +74,7 @@ public class TokenConfiguration {
 
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
+
         System.out.println("### Token customizer foi invocado");
 
         return context -> {
@@ -82,6 +85,7 @@ public class TokenConfiguration {
             if (context.getTokenType().getValue().equals("access_token")) {
 
                 final Authentication user = context.getPrincipal();
+                final User principal = (User) user.getPrincipal();
 
                 final List<String> authorities = user.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
@@ -95,7 +99,7 @@ public class TokenConfiguration {
                         .expiresAt(Instant.now().plus(Duration.ofHours(1)));
                 System.out.println("Emitindo token via authorization_code, enviando mensagem para Kafka");
 
-                AccessLoginDTO loginInfo = AccessLoginDTO.from(user.getName(), authorities.getFirst());
+                AccessLoginDTO loginInfo = AccessLoginDTO.from(principal.getId().toString(), user.getName(), authorities.getFirst());
                 System.out.println("🔥 Publicando evento LoginAccessEvent: " + loginInfo);
                 eventPublisher.publishEvent(new LoginAccessEvent(this, loginInfo));
             }

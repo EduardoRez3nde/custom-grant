@@ -1,4 +1,4 @@
-package com.customgrant.student_service.dto;
+package com.customgrant.student_service.dto.course;
 
 import java.util.ArrayList;
 import java.util.List;
